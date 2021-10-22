@@ -19,6 +19,8 @@ competition Competition;
 
 controller Controller1;
 
+motor chain (PORT4, ratio18_1);
+
 motor lBack (PORT1, ratio18_1);
 motor lFront (PORT2, ratio18_1);
 
@@ -39,7 +41,7 @@ float frontSpeed = 1  ;
 float backSpeed = 1;
 float driveSpeed = 1;
 float armSpeed = 70;
-
+float chainSpeed = 80;
 
 //settings
 double kP = 0.25;
@@ -130,6 +132,8 @@ void DriveDistance(int dist, float maxTime)
     lastError = distError;
 
     motorSpeed = Kp * distError + Ki * integral + Kd * derivative;
+    lTrain.spin(fwd, motorSpeed, pct);
+    rTrain.spin(fwd, motorSpeed, pct);
   }
 }
 
@@ -168,13 +172,7 @@ void UpdateScreen() {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  Train.turnFor(90, deg);
-  wait(100, msec);
-  Train.driveFor(fwd, 100, mm);
-  wait(100, msec);
-  arm.spinFor(90, deg);
-  wait(100, msec);
-  Train.driveFor(reverse, 100, mm);
+  
   DriveDistance(50, 5);
 }
 
@@ -196,11 +194,11 @@ void usercontrol(void) {
     // values based on feedback from the joysticks.
     
     //arm commands
-    if(Controller1.ButtonL1.pressing()||Controller1.ButtonR1.pressing()){
-      lArm.spin(fwd, armSpeed, pct);
-      rArm.spin(fwd, armSpeed, pct);
-    }
-    else if(Controller1.ButtonL2.pressing()||Controller1.ButtonR2.pressing()){
+    if(Controller1.ButtonL1.pressing()){
+      lArm.spin(reverse, armSpeed, pct);
+      rArm.spin(reverse, armSpeed, pct);
+    }  
+    else if(Controller1.ButtonL2.pressing()){
       lArm.spin(fwd, armSpeed, pct);
       rArm.spin(fwd, armSpeed, pct);
     }
@@ -208,7 +206,14 @@ void usercontrol(void) {
       lArm.spin(fwd, 0.3, pct);
       rArm.spin(fwd, 0.3, pct);
     }
-
+     
+    //chain spin
+    if(Controller1.ButtonR1.pressing()){
+      chain.spin(fwd, chainSpeed, pct);
+    }
+    if(Controller1.ButtonR2.pressing()){
+      chain.spin(fwd, chainSpeed,pct);
+    }
     //limit the turning speed of the motors
    //if(Controller1.Axis2.position()-Controller1.Axis3.position()>50){
      // driveSpeed = 0.70;
