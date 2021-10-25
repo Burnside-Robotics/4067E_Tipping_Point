@@ -211,8 +211,11 @@ void usercontrol(void) {
     if(Controller1.ButtonR1.pressing()){
       chain.spin(fwd, chainSpeed, pct);
     }
-    if(Controller1.ButtonR2.pressing()){
-      chain.spin(fwd, chainSpeed,pct);
+    else if (Controller1.ButtonR2.pressing()){
+      chain.spin(reverse, chainSpeed,pct);
+    }
+    else {
+      chain.stop();
     }
     //limit the turning speed of the motors
    //if(Controller1.Axis2.position()-Controller1.Axis3.position()>50){
