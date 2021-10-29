@@ -20,6 +20,7 @@ competition Competition;
 controller Controller1;
 
 motor chain (PORT4, ratio18_1);
+motor deflector (PORT5, ratio18_1);
 
 motor lBack (PORT1, ratio18_1);
 motor lFront (PORT2, ratio18_1);
@@ -42,6 +43,7 @@ float backSpeed = 1;
 float driveSpeed = 1;
 float armSpeed = 70;
 float chainSpeed = 80;
+float deflectorSpeed = 50;
 
 //settings
 double kP = 0.25;
@@ -217,6 +219,18 @@ void usercontrol(void) {
     else {
       chain.stop();
     }
+
+    //defelctor spin
+    if(Controller1.ButtonUp.pressing()){
+      deflector.spin(fwd, deflectorSpeed, pct);
+    }
+    else if(Controller1.ButtonDown.pressing()){
+      deflector.spin(reverse, deflectorSpeed, pct);
+    }
+    else{
+      deflector.spin(fwd, 1, pct);
+    }
+
     //limit the turning speed of the motors
    //if(Controller1.Axis2.position()-Controller1.Axis3.position()>50){
      // driveSpeed = 0.70;
