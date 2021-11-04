@@ -217,7 +217,7 @@ void usercontrol(void) {
       chain.spin(reverse, chainSpeed,pct);
     }
     else {
-      chain.stop();
+      chain.stop(vex::brake);
     }
 
     //defelctor spin
@@ -228,7 +228,7 @@ void usercontrol(void) {
       deflector.spin(reverse, deflectorSpeed, pct);
     }
     else{
-      deflector.spin(fwd, 1, pct);
+      deflector.spin(fwd, 0.5, pct);
     }
 
     //limit the turning speed of the motors
