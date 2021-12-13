@@ -25,8 +25,8 @@ motor deflector (PORT5, ratio18_1);
 motor lBack (PORT1, ratio18_1);
 motor lFront (PORT2, ratio18_1);
 
-motor rBack (PORT11, ratio18_1);
-motor rFront (PORT12, ratio18_1);
+motor rBack (PORT11, ratio18_1, true);
+motor rFront (PORT12, ratio18_1, true);
 
 motor lArm (PORT3, ratio18_1);
 motor rArm (PORT13, ratio18_1, true);
@@ -134,8 +134,8 @@ void DriveDistance(int dist, float maxTime)
     lastError = distError;
 
     motorSpeed = Kp * distError + Ki * integral + Kd * derivative;
-    lTrain.spin(fwd, motorSpeed, pct);
-    rTrain.spin(fwd, motorSpeed, pct);
+    lTrain.spin(forward, motorSpeed, pct);
+    rTrain.spin(forward, motorSpeed, pct);
   }
 }
 
@@ -163,6 +163,26 @@ void UpdateScreen() {
     Controller1.Screen.print("%%");
   }
 }
+
+void reverseDrive() {
+
+
+
+    lTrain.spin(vex::directionType::fwd, Controller1.Axis3.position(vex::percentUnits::pct) * driveSpeed, vex::velocityUnits::pct);
+    rTrain.spin(vex::directionType::fwd, Controller1.Axis2.position(vex::percentUnits::pct) * driveSpeed, vex::velocityUnits::pct);
+
+    //Stops the motor if the controller joystick's position is equal to 0
+    if(Controller1.Axis2.position() == 0){
+      rTrain.stop(vex::brake);
+    }
+    else if(Controller1.Axis3.position() == 0){
+      lTrain.stop(vex::brake);
+    }
+    else if(Controller1.Axis2.position() == 0 && Controller1.Axis3.position() == 0){
+      rTrain.stop(vex::brake);
+      lTrain.stop(vex::brake);
+    }
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -174,8 +194,7 @@ void UpdateScreen() {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  
-  DriveDistance(50, 5);
+    //DriveDistance(10, 4);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -244,7 +263,7 @@ void usercontrol(void) {
 
     //drive commands
     lTrain.spin(vex::directionType::fwd, Controller1.Axis3.position(vex::percentUnits::pct) * driveSpeed, vex::velocityUnits::pct);
-    rTrain.spin(vex::directionType::rev, Controller1.Axis2.position(vex::percentUnits::pct) * driveSpeed, vex::velocityUnits::pct);
+    rTrain.spin(vex::directionType::fwd, Controller1.Axis2.position(vex::percentUnits::pct) * driveSpeed, vex::velocityUnits::pct);
 
     //Stops the motor if the controller joystick's position is equal to 0
     if(Controller1.Axis2.position() == 0){
@@ -257,27 +276,6 @@ void usercontrol(void) {
       rTrain.stop(vex::brake);
       lTrain.stop(vex::brake);
     }
-     
-
-
-    /*if(Controller1.Axis3.position()<0){
-      ///lFront.spin(reverse, Controller1.Axis3.position()*frontSpeed, pct);
-      //lBack.spin(reverse, Controller1.Axis3.position()*backSpeed, pct);
-    }
-    else if(Controller1.Axis3.position()>0){
-      lFront.spin(fwd, Controller1.Axis3.position()*frontSpeed, pct);
-      lBack.spin(fwd, Controller1.Axis3.position()*backSpeed, pct);
-    }
-
-    if(Controller1.Axis2.position()<0){
-      rFront.spin(reverse, Controller1.Axis2.position()*frontSpeed, pct);
-      rBack.spin(reverse, Controller1.Axis2.position()*backSpeed, pct);
-    }
-    else if(Controller1.Axis2.position()>0){
-      rFront.spin(fwd, Controller1.Axis2.position()*frontSpeed, pct);
-      rBack.spin(fwd, Controller1.Axis2.position()*backSpeed, pct);
-    }
-    */
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
@@ -292,6 +290,10 @@ int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   UpdateScreen();
+
+  Controller1.ButtonA.pressed(reverseDrive);
+  Controller1.ButtonB.pressed(usercontrol);
+
   // Run the pre-autonomous function.
   pre_auton();
 
